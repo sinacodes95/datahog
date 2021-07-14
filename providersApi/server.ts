@@ -1,11 +1,12 @@
-const express = require('express');
-const providers = require('./providers.json');
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { providers } from './providers';
 const app = express();
 const port = 3000;
 
 const FAILURE_PROBABILITY = 0.5;
 
-function randomFailuresMiddleware(_, res, next) {
+function randomFailuresMiddleware(_: Request, res: Response, next: NextFunction) {
     if (Math.random() > 1 - FAILURE_PROBABILITY) {
         res.setHeader('Content-Type', 'text/plain');
         res.writeHead(500, res.headers);
@@ -16,7 +17,7 @@ function randomFailuresMiddleware(_, res, next) {
 
 app.use(randomFailuresMiddleware);
 
-app.get('/providers/:id', (req, res) => {
+app.get('/providers/:id', (req: Request, res: Response) => {
     const bills = providers[req.params.id];
     if (!bills) return res.status(404).end();
     res.send(bills);

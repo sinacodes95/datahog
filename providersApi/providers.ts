@@ -1,5 +1,16 @@
-{
-    "gas": [
+interface Bills {
+    billedOn: string,
+    amount: number
+}
+
+interface Providers {
+    [key: string]: Bills[] ,
+    gas: Bills[],
+    internet: Bills[]
+}
+
+export const providers: Providers = {
+    gas: [
         {
             "billedOn": "2020-04-07T15:03:14.257Z",
             "amount": 22.27
@@ -9,7 +20,7 @@
             "amount": 30.00
         }
     ],
-    "internet": [
+    internet: [
         {
             "billedOn": "2020-02-07T15:03:14.257Z",
             "amount": 15.12
