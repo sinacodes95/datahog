@@ -4,7 +4,7 @@ interface Bills {
 }
 
 interface Providers {
-    [key: string]: Bills[] ,
+    [key: string]: Bills[] | undefined ,
     gas: Bills[],
     internet: Bills[]
 }
