@@ -2,7 +2,7 @@
   "inlcude": [
     "./providersApi/**/*",
     "./webhooksApi/**/*",
-    "./allbackApi/**/*",
+    "./callbackApi/**/*",
   ],
 
   "compilerOptions": {
