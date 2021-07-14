@@ -4,7 +4,8 @@
   "description": "Mock APIs",
   "main": "index.js",
   "scripts": {
-    "start": "node ./build/server.js",
+    "start:providers": "node ./build/providersApi/server.js",
+    "start:webhooks": "node ./build/webhooksApi/index.js",
     "build": "tsc --resolveJsonModule",
     "lint": "eslint --color './providersApi/**/*.ts'",
     "test": "echo \"Error: no test specified\" && exit 1"
