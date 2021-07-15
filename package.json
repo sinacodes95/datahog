@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "Mock APIs",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start:providers": "node ./build/providersApi/server.js",
     "start:webhooks": "node ./build/webhooksApi/index.js",
     "build": "tsc --resolveJsonModule",
     "lint": "eslint --color './providersApi/**/*.ts'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "license": "ISC",
   "devDependencies": {
@@ -16,7 +17,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/bull": "^3.15.2",
     "@types/express": "^4.17.1",
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^26.0.24",
     "@types/node": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.28.1",
     "@typescript-eslint/parser": "^4.28.1",
@@ -25,10 +26,21 @@
     "jest": "^27.0.6",
     "jest-html-reporter": "^3.4.0",
     "prettier": "^2.3.0",
+    "ts-jest": "^27.0.3",
     "typescript": "^4.3.5"
   },
   "dependencies": {
     "bull": "^3.23.0",
     "express": "^4.17.1"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!variables/.*)"
+    ]
   }
 }
