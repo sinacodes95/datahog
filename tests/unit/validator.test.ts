@@ -37,4 +37,4 @@ describe('Given a list of providers and a callbackUrl string', () => {
         const result = validateProvidersData(invalidProviders, invalidCallbackUrl);
         expect(result).toBe(false);
     });
-})
+});
