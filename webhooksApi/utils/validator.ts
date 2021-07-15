@@ -1,8 +1,11 @@
 export const validateProvidersData = (
-    providers: string[],
-    callbackUrl: string
+    providers?: string[],
+    callbackUrl?: string
 ): boolean => {
-    return areProvidersValid(providers) && isCallbackUrlValid(callbackUrl);
+    if (providers && callbackUrl) {
+        return areProvidersValid(providers) && isCallbackUrlValid(callbackUrl);
+    }
+    return false;
 };
 
 export const isCallbackUrlValid = (

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import Bull from "bull";
-import { providersQueueProcess } from '../processes/providers.process'
+import { providersQueueProcess } from '../processes/providersProcess'
 
 const providersQueue = new Bull('providers', {
     redis: process.env.REDIS_URL
@@ -16,4 +16,4 @@ export const providersJobProducer = async (data: unknown): Promise<void> => {
 }
 
 // Consumer
-providersQueue.process(providersQueueProcess);
+void providersQueue.process(providersQueueProcess);
