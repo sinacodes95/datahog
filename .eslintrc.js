@@ -25,5 +25,6 @@ module.exports = {
       "@typescript-eslint/no-floating-promises": ["error"],
       "@typescript-eslint/prefer-for-of": ["error"],
       "@typescript-eslint/no-unnecessary-condition": ["error", { "allowConstantLoopConditions": true }],
+      "@typescript-eslint/no-misused-promises": "off"
     }
   }
