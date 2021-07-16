@@ -1,6 +1,7 @@
 import { Job } from "bull";
 
-export const providersQueueProcess = (job: Job) => {
-    console.log('queue processer: ', job)
+const providersQueueProcess = async (job: Job) => {
+    console.log("Message sent: %s");
 };
 
+export default providersQueueProcess;

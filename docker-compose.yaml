@@ -3,25 +3,37 @@ version: "3"
 services:
     redis:
         image: redis
+        restart: always
         environment:
-            - ALLOW_EMPTY_PASSWORD=yes
+          - ALLOW_EMPTY_PASSWORD=yes
         ports:
-            - 6379:6379
+          - 6379:6379
 
     providers-api:
         build:
-            context: '.'
+            context: ./
             dockerfile: './Dockerfile.providers'
         ports: 
-            - 3000:3000
+            -   3000:3000
+
+    redis-commander:
+        image: rediscommander/redis-commander
+        restart: always
+        environment:
+          - REDIS_HOSTS=local:redis:6379
+        ports:
+          - "8081:8081"
             
     webhooks-api:
         build:
-            context: '.'
+            context: ./
             dockerfile: './Dockerfile.webhooks'
         environment:
-            REDIS_URL: redis:6379
+            REDIS_URL: 'redis://redis:6379'
+            CHOKIDAR_USEPOLLING: 'true'
+            CHOKIDAR_INTERVAL: 1000
         ports:
-            - 4000:4000
+        - 4000:4000
+
         depends_on:
             - redis

@@ -1,19 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import Bull from "bull";
-import { providersQueueProcess } from '../processes/providersProcess'
+import Bull, {Job} from "bull";
+import providersQueueProcess from "../processes/providersProcess";
 
-const providersQueue = new Bull('providers', {
-    redis: process.env.REDIS_URL
-});
+const REDIS_HOST = process.env.REDIS_URL || 'redis';
 
-// Producer
-export const providersJobProducer = async (data: unknown): Promise<void> => {
-    await providersQueue.add(data, {
-        
-    });
+export interface ProvidersData {
+    providers?: string[];
+    callbackUrl?: string;
 }
 
-// Consumer
-void providersQueue.process(providersQueueProcess);
+const providersQueue = new Bull('providers', REDIS_HOST);
+
+providersQueue.process(providersQueueProcess)
+
+export const providersJobProducer = async (data: ProvidersData): Promise<Job|void> => {
+    try {
+        console.log('Adding to queue',)
+        return await providersQueue.add(data, {
+            attempts: 3,
+            backoff: 5000
+        });
+    } catch (e) {
+        console.log('Producer Error: ', e)
+    }
+}

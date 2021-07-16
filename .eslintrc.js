@@ -26,6 +26,8 @@ module.exports = {
       "@typescript-eslint/prefer-for-of": ["error"],
       "@typescript-eslint/no-unnecessary-condition": ["error", { "allowConstantLoopConditions": true }],
       "@typescript-eslint/no-misused-promises": "off",
-      "no-useless-escape": "off"
+      "no-useless-escape": "off",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/require-await": "off"
     }
   }
