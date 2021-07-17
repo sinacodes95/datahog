@@ -1,8 +1,8 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import { validateProvidersData } from './utils/validator';
-import { providersJobProducer, ProvidersData } from './queues/providersQueue';
-
+import { requestConsumer, ProvidersData } from './queues/providersQueue';
+import { extractJobIds } from './utils/extractJobIds'
 
 const PORT = 4000;
 const app = express();
@@ -10,17 +10,31 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded());
 
-app.post('/queue', async (req: Request, res: Response) => {
+const queueRequestHandler = async (
+    providers: string[]|undefined,
+    callbackUrl: string|undefined,
+    res: Response
+) => {
+    if(validateProvidersData(providers, callbackUrl)) {
+        console.log('validated')
+        res.status(200);
+        const jobs = await requestConsumer({ providers, callbackUrl })
+        const jobIds = extractJobIds(jobs)
+        
+        res.send({status: 'Items queued', jobIds});
+    } else {
+        res.status(400);
+        res.send({status: 'Invalid provider or callbackUrl'});
+    }
+}
+
+app.post('/queue', async (
+    req: Request,
+    res: Response
+) => {
     const { providers, callbackUrl } = req.body as ProvidersData;
     try {
-        if(validateProvidersData(providers, callbackUrl)) {
-            res.status(200);
-            await providersJobProducer({ providers, callbackUrl })
-            res.send({status: 'Items queued'});
-        } else {
-            res.status(400);
-            res.send({status: 'Invalid provider or callbackUrl'});
-        }
+        await queueRequestHandler(providers, callbackUrl, res)
     } catch(e) {
         console.log(e)
     }

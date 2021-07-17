@@ -11,7 +11,7 @@ export const validateProvidersData = (
 export const isCallbackUrlValid = (
     callbackUrl: string
 ): boolean => {
-    return (/^https?:\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/).test(callbackUrl);
+    return (/^(callback-api)|(https?):\/\/\w+(\.\w+)*(:[0-9]+)?\/?(\/[.\w]*)*$/).test(callbackUrl);
 }
 
 export const areProvidersValid = (
