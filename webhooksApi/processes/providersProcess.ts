@@ -1,28 +1,71 @@
 import { Job } from "bull";
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 import { PROVIDERS_BASE_URL } from '../../networkConfig';
+import { aggregatedCallbackRequests } from "../utils/aggregateCallbackRequests";
 
-const providersQueueProcess = async (job: Job) => {
+interface Bills {
+    billedOn: string,
+    amount: number
+}
+
+interface jobData {
+    provider: string;
+    callbackUrl: string
+}
+
+const providersQueueProcess = async (job: Job): Promise<unknown> => {
     console.log("Processing fast", job.data);
     try {
         console.log("attempts made:", job.attemptsMade);
-        const { providers, callbackUrl } = job.data;
-        const {data, status} = await axios.get(`${PROVIDERS_BASE_URL}/providers/${providers[0]}`);
+        const { provider, callbackUrl } = job.data as jobData;
+
+        const {data, status} = await axios.get<AxiosResponse>(
+            `${PROVIDERS_BASE_URL}/providers/${provider}`
+        );
         console.log('result ', data);
         if(status === 200){
+            // call callbackUrl
             return Promise.resolve(data);
         }
     } catch (e) {
         if (job.attemptsMade >= 2) {
-            notifySupport(`COMPLETE FAILURE FOR JOB: ${job.id}`);
+            notifySupport(job.id);
         }
         return Promise.reject(e)
     }
 };
 
-const notifySupport = (message: string) => {
-    console.log(message);
+const providersBulkQueueProcess = async (job: Job): Promise<unknown> => {
+    console.log("attempts made: ", job.attemptsMade);
+    const aggregatedProvidersData = [];
+    try {
+        console.log('bulk processorof job: ', job);
+        const { provider, callbackUrl } = job.data as jobData;
+
+        const {data, status} = await axios.get<AxiosResponse>(
+            `${PROVIDERS_BASE_URL}/providers/${provider}`
+        );
+        console.log('Bulk result ', data);
+        if(status === 200){
+
+            aggregatedProvidersData.push(data);
+            await aggregatedCallbackRequests(aggregatedProvidersData)
+
+            return Promise.resolve(data);
+        }
+    } catch (e) {
+        if (job.attemptsMade >= 2) {
+            notifySupport(job.id);
+        }
+        return Promise.reject(e)
+    }
+
 }
 
-export { providersQueueProcess};
+
+const notifySupport = (jobId: string|number) => {
+    console.log(`COMPLETE FAILURE FOR JOB: ${jobId}`);
+}
+
+export { providersQueueProcess, providersBulkQueueProcess };

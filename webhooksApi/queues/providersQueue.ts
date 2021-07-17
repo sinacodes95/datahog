@@ -1,16 +1,15 @@
 import Bull, {Job, Queue} from "bull";
-import { providersQueueProcess } from "../processes/providersProcess";
-import { bulkJobsDataParser } from "../utils/bulkJobsDataParser"
+import { providersQueueProcess, providersBulkQueueProcess } from "../processes/providersProcess";
+import { bulkJobsDataParser, singleJobDataParser, BULK_QUEUE, SINGLE_QUEUE } from "../utils/jobsDataParser"
 
 const REDIS_HOST = process.env.REDIS_URL || 'redis';
-const SINGLE_QUEUE = 'Single_Queue';
 
 interface ProvidersData {
-    providers?: string[];
-    callbackUrl?: string;
+    providers: string[];
+    callbackUrl: string;
 }
 
-interface BulkProvidersData {
+interface AddProvidersData {
     name?: string;
     data: {
         provider: string,
@@ -21,26 +20,23 @@ interface BulkProvidersData {
 
 const providersQueue = new Bull('providers', REDIS_HOST);
 
-providersQueue.process(providersQueueProcess)
+providersQueue.process(SINGLE_QUEUE, providersQueueProcess)
+providersQueue.process(BULK_QUEUE, providersBulkQueueProcess)
 
 const providersJobProducer = async (
-    data: ProvidersData,
+    data: AddProvidersData,
     myProvidersQueue: Queue = providersQueue
 ): Promise<Job|void> => {
     try {
         console.log('Adding to fast queue',)
-        return await myProvidersQueue.add(SINGLE_QUEUE, data, {
-            attempts: 3,
-            backoff: 2000
-            // delay: getDelay time for scheduled maintenance
-        });
+        return await myProvidersQueue.add(data)
     } catch (e) {
         console.log('Producer Error: ', e)
     }
 }
 
 const providersBulkJobProducer = async (
-    data: BulkProvidersData[],
+    data: AddProvidersData[],
     myProvidersQueue: Queue = providersQueue
 ): Promise<Job[]|void> => {
     try {
@@ -53,11 +49,12 @@ const providersBulkJobProducer = async (
 
 const requestConsumer = async (jobData: ProvidersData): Promise<Job|Job[]|void> => {
     console.log('consumer')
-    if (jobData.providers && jobData.providers.length > 1) {
+    if (jobData.providers.length > 1) {
         const jobsCollection = bulkJobsDataParser(jobData);
         return await providersBulkJobProducer(jobsCollection)
     } else {
-        return await providersJobProducer(jobData)
+        const singleJob = singleJobDataParser(jobData);
+        return await providersJobProducer(singleJob)
     }
 }
 
@@ -66,5 +63,5 @@ export {
     providersJobProducer,
     requestConsumer,
     ProvidersData,
-    BulkProvidersData
+    AddProvidersData
 }

@@ -1,4 +1,4 @@
-import { bulkJobsDataParser } from '../../webhooksApi/utils/bulkJobsDataParser'
+import { bulkJobsDataParser, singleJobDataParser } from '../../webhooksApi/utils/jobsDataParser'
 
 describe('Given a bulk request is made', () => {
     const exampleProvidersData = {
@@ -33,5 +33,22 @@ describe('Given a bulk request is made', () => {
         ]
         expect(actualResult[0].data.provider).toEqual(expectedResult[0].data.provider);
         expect(actualResult[1].data.provider).toEqual(expectedResult[1].data.provider);
+    });
+
+    test('When singleJobsDataParser is invoked, Then an "add queue" objects is returned', () => {
+        const actualResult = singleJobDataParser(exampleProvidersData);
+        const expectedResult = { 
+            name: 'Single_Queue',
+            data: {
+                provider: 'gas',
+                callbackUrl: 'http:helloWorld.com'
+            },
+            opts: {
+                attempts: 3,
+                backoff: 2000
+            }
+        }
+
+        expect(actualResult).toMatchObject(expectedResult);
     });
 })

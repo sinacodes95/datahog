@@ -7,8 +7,8 @@
     "start:providers": "node ./build/providersApi/server.js",
     "start:webhooks": "node ./build/webhooksApi/index.js",
     "build": "tsc",
-    "lint": "eslint --color './providersApi/**/*.ts'",
-    "test": "jest --detectOpenHandles --runInBand --forceExit"
+    "lint": "eslint --color './providersApi/**/*.ts' './webhooksApi/**/*.ts'",
+    "test": "jest --runInBand --forceExit"
   },
   "license": "ISC",
   "devDependencies": {

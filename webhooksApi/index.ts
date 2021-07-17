@@ -4,6 +4,11 @@ import { validateProvidersData } from './utils/validator';
 import { requestConsumer, ProvidersData } from './queues/providersQueue';
 import { extractJobIds } from './utils/extractJobIds'
 
+interface unverifiedProvidersData {
+    providers?: string[];
+    callbackUrl?: string;
+}
+
 const PORT = 4000;
 const app = express();
 
@@ -16,9 +21,10 @@ const queueRequestHandler = async (
     res: Response
 ) => {
     if(validateProvidersData(providers, callbackUrl)) {
+        const data = { providers, callbackUrl } as ProvidersData
         console.log('validated')
         res.status(200);
-        const jobs = await requestConsumer({ providers, callbackUrl })
+        const jobs = await requestConsumer(data)
         const jobIds = extractJobIds(jobs)
         
         res.send({status: 'Items queued', jobIds});
@@ -32,7 +38,7 @@ app.post('/queue', async (
     req: Request,
     res: Response
 ) => {
-    const { providers, callbackUrl } = req.body as ProvidersData;
+    const { providers, callbackUrl } = req.body as unverifiedProvidersData;
     try {
         await queueRequestHandler(providers, callbackUrl, res)
     } catch(e) {

@@ -14,7 +14,7 @@ describe('Given that adding to the queue was success', () => {
     test('When no job is returned, Then empty array is returned', () => {
         const actualResult = extractJobIds(undefined);
         const actualResultNull = extractJobIds(null);
-        expect(actualResult).toEqual([]);
-        expect(actualResultNull).toEqual([]);
+        expect(actualResult).toEqual('');
+        expect(actualResultNull).toEqual('');
     });
 })
