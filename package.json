@@ -8,7 +8,7 @@
     "start:webhooks": "node ./build/webhooksApi/index.js",
     "build": "tsc",
     "lint": "eslint --color './providersApi/**/*.ts'",
-    "test": "jest"
+    "test": "jest --detectOpenHandles --runInBand --forceExit"
   },
   "license": "ISC",
   "devDependencies": {
@@ -30,6 +30,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "bull": "^3.25.1",
     "express": "^4.17.1"
   },
