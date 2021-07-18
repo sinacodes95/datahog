@@ -7,12 +7,8 @@ const REDIS_HOST = process.env.REDIS_URL || 'redis';
 
 const providersQueue = new Bull('providers', REDIS_HOST);
 
-try {
-    providersQueue.process(SINGLE_QUEUE, providersQueueProcess)
-    providersQueue.process(BULK_QUEUE, providersBulkQueueProcess)
-} catch (e) {
-    console.log('Processor Error:', e)
-}
+providersQueue.process(SINGLE_QUEUE, providersQueueProcess)
+providersQueue.process(BULK_QUEUE, providersBulkQueueProcess)
 
 const providersJobProducer = async (
     {name, data, opts}: AddProvidersData,
@@ -39,7 +35,7 @@ const providersBulkJobProducer = async (
 }
 
 const requestConsumer = async (jobData: ProvidersData): Promise<Job|Job[]|void> => {
-    console.log('consumer')
+    console.log('Request is being processed by consumer')
     if (jobData.providers.length > 1) {
         const jobsCollection = bulkJobsDataParser(jobData);
         return await providersBulkJobProducer(jobsCollection)

@@ -12,7 +12,7 @@ describe('Given a bulk of data jobs has been queued', () => {
             { billedOn: '2020-04-07T15:03:14.257Z', amount: 22.27 },
             { billedOn: '2020-05-07T15:03:14.257Z', amount: 30 }
         ];
-        await aggregateAndSendProvidersData('gas', exampleBills); 
+        await aggregateAndSendProvidersData('gas', CALLBACK_BASE_URL, exampleBills); 
 
         expect(aggregatedProvidersDataForCallback).toHaveProperty('gas')
     });
@@ -21,7 +21,7 @@ describe('Given a bulk of data jobs has been queued', () => {
             { billedOn: '2020-04-07T15:03:14.257Z', amount: 22.27 },
             { billedOn: '2020-05-07T15:03:14.257Z', amount: 30 }
         ];
-        await aggregateAndSendProvidersData('gas', exampleBills); 
+        await aggregateAndSendProvidersData('gas', CALLBACK_BASE_URL, exampleBills); 
 
         expect(mockedAxios.post).not.toHaveBeenCalled();
     });
@@ -30,8 +30,8 @@ describe('Given a bulk of data jobs has been queued', () => {
             { billedOn: '2020-04-07T15:03:14.257Z', amount: 22.27 },
             { billedOn: '2020-05-07T15:03:14.257Z', amount: 30 }
         ];
-        await aggregateAndSendProvidersData('gas', exampleBills);
-        await aggregateAndSendProvidersData('internet', exampleBills);
+        await aggregateAndSendProvidersData('gas', CALLBACK_BASE_URL, exampleBills);
+        await aggregateAndSendProvidersData('internet', CALLBACK_BASE_URL, exampleBills);
 
         expect(mockedAxios.post).toHaveBeenCalled();
         expect(mockedAxios.post).toHaveBeenCalledWith(`${CALLBACK_BASE_URL}/`, {
@@ -53,8 +53,8 @@ describe('Given a bulk of data jobs has been queued', () => {
         mockedAxios.post.mockImplementation(() => Promise.reject());
         let errorThrown = false;
         try {
-            await aggregateAndSendProvidersData('gas', exampleBills);
-            await aggregateAndSendProvidersData('internet', exampleBills);
+            await aggregateAndSendProvidersData('gas', CALLBACK_BASE_URL, exampleBills);
+            await aggregateAndSendProvidersData('internet', CALLBACK_BASE_URL, exampleBills);
         } catch (e) {
             errorThrown = true;
         }

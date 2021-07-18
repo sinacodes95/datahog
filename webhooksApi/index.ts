@@ -18,7 +18,7 @@ const queueRequestHandler = async (
 ) => {
     if(validateProvidersData(providers, callbackUrl)) {
         const data = { providers, callbackUrl } as ProvidersData
-        console.log('validated')
+        console.log('-- Providers data validated --')
         res.status(200);
         const jobs = await requestConsumer(data)
         const jobIds = extractJobIds(jobs)
