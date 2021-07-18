@@ -11,7 +11,7 @@ export const bulkJobsDataParser = (jobData: ProvidersData): AddProvidersData[]=>
                 callbackUrl
             }
             return { name: BULK_QUEUE, data: providersData, opts: {
-                attempts: 3,
+                attempts: 5,
                 backoff: 2000
                 // delay: getDelay time for scheduled maintenance
             }};
@@ -29,7 +29,7 @@ export const singleJobDataParser = (jobData: ProvidersData): AddProvidersData =>
             callbackUrl
         },
         opts: {
-            attempts: 3,
+            attempts: 5,
             backoff: 2000
         }
     }

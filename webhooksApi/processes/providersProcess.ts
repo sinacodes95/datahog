@@ -1,31 +1,22 @@
 import { Job } from "bull";
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
-import { PROVIDERS_BASE_URL } from '../../networkConfig';
-import { aggregatedCallbackRequests } from "../utils/aggregateCallbackRequests";
+import { CALLBACK_BASE_URL, PROVIDERS_BASE_URL } from '../../networkConfig';
+import { Bills, CallbackData, JobData } from "../../types/types";
 
-interface Bills {
-    billedOn: string,
-    amount: number
-}
+const MAX_PROVIDERS = 2;
 
-interface jobData {
-    provider: string;
-    callbackUrl: string
-}
-
-const providersQueueProcess = async (job: Job): Promise<unknown> => {
+const providersQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown> => {
     console.log("Processing fast", job.data);
+    console.log("attempts made:", job.attemptsMade);
+    const providersDataForCallback: {[k: string]: Bills[]} = {};
     try {
-        console.log("attempts made:", job.attemptsMade);
-        const { provider, callbackUrl } = job.data as jobData;
-
-        const {data, status} = await axios.get<AxiosResponse>(
-            `${PROVIDERS_BASE_URL}/providers/${provider}`
-        );
+        const {provider, data, status} = await getBillsFromProviders(job.data);
         console.log('result ', data);
         if(status === 200){
-            // call callbackUrl
+            providersDataForCallback[provider] = data;
+            await sendBillsOfProvidersToCallbackUrl(providersDataForCallback)
+
             return Promise.resolve(data);
         }
     } catch (e) {
@@ -36,22 +27,20 @@ const providersQueueProcess = async (job: Job): Promise<unknown> => {
     }
 };
 
-const providersBulkQueueProcess = async (job: Job): Promise<unknown> => {
+const aggregatedProvidersDataForCallback: {
+    [k: string]: Bills[]
+} = {};
+
+const providersBulkQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown> => {
+    console.log('bulk processorof job');
     console.log("attempts made: ", job.attemptsMade);
-    const aggregatedProvidersData = [];
     try {
-        console.log('bulk processorof job: ', job);
-        const { provider, callbackUrl } = job.data as jobData;
-
-        const {data, status} = await axios.get<AxiosResponse>(
-            `${PROVIDERS_BASE_URL}/providers/${provider}`
-        );
+        const {
+            provider, data, status} = await getBillsFromProviders(job.data);
         console.log('Bulk result ', data);
+
         if(status === 200){
-
-            aggregatedProvidersData.push(data);
-            await aggregatedCallbackRequests(aggregatedProvidersData)
-
+            await AggregateAndSendProvidersData(provider, data);
             return Promise.resolve(data);
         }
     } catch (e) {
@@ -60,7 +49,39 @@ const providersBulkQueueProcess = async (job: Job): Promise<unknown> => {
         }
         return Promise.reject(e)
     }
+}
 
+const AggregateAndSendProvidersData = async (
+    provider: string,
+    data: Bills[]
+): Promise<void> => {
+    aggregatedProvidersDataForCallback[provider] = data;
+    console.log(JSON.stringify(aggregatedProvidersDataForCallback, null, 2))
+    if (Object.keys(aggregatedProvidersDataForCallback).length === MAX_PROVIDERS) {
+        await sendBillsOfProvidersToCallbackUrl(aggregatedProvidersDataForCallback)
+    }
+}
+
+const sendBillsOfProvidersToCallbackUrl = async (payload: CallbackData) => {
+    console.log('Calling callback url with: ', payload);
+    try {
+        await axios.post(`${CALLBACK_BASE_URL}/`, payload)
+    } catch (e) {
+        console.log('Error while sending data to callback url: ', e)
+    }
+}
+
+const getBillsFromProviders = async (jobData: JobData): Promise<{
+    provider: string,
+    data: Bills[],
+    status: number
+}> => {
+    const { provider } = jobData;
+
+    const {data, status} = await axios.get<Bills[]>(
+        `${PROVIDERS_BASE_URL}/providers/${provider}`
+    );
+    return {provider, data, status};
 }
 
 

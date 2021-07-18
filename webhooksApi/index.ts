@@ -3,11 +3,7 @@ import type { Request, Response } from 'express';
 import { validateProvidersData } from './utils/validator';
 import { requestConsumer, ProvidersData } from './queues/providersQueue';
 import { extractJobIds } from './utils/extractJobIds'
-
-interface unverifiedProvidersData {
-    providers?: string[];
-    callbackUrl?: string;
-}
+import { unverifiedProvidersData } from '../types/types';
 
 const PORT = 4000;
 const app = express();

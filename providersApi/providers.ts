@@ -1,13 +1,4 @@
-interface Bills {
-    billedOn: string,
-    amount: number
-}
-
-interface Providers {
-    [key: string]: Bills[] | undefined ,
-    gas: Bills[],
-    internet: Bills[]
-}
+import { Providers } from "../types/types";
 
 export const providers: Providers = {
     gas: [

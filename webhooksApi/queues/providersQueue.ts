@@ -1,35 +1,26 @@
 import Bull, {Job, Queue} from "bull";
+import { AddProvidersData, ProvidersData } from "../../types/types";
 import { providersQueueProcess, providersBulkQueueProcess } from "../processes/providersProcess";
 import { bulkJobsDataParser, singleJobDataParser, BULK_QUEUE, SINGLE_QUEUE } from "../utils/jobsDataParser"
 
 const REDIS_HOST = process.env.REDIS_URL || 'redis';
 
-interface ProvidersData {
-    providers: string[];
-    callbackUrl: string;
-}
-
-interface AddProvidersData {
-    name?: string;
-    data: {
-        provider: string,
-        callbackUrl: string
-    };
-    opts?: Bull.JobOptions
-}
-
 const providersQueue = new Bull('providers', REDIS_HOST);
 
-providersQueue.process(SINGLE_QUEUE, providersQueueProcess)
-providersQueue.process(BULK_QUEUE, providersBulkQueueProcess)
+try {
+    providersQueue.process(SINGLE_QUEUE, providersQueueProcess)
+    providersQueue.process(BULK_QUEUE, providersBulkQueueProcess)
+} catch (e) {
+    console.log('Processor Error:', e)
+}
 
 const providersJobProducer = async (
-    data: AddProvidersData,
+    {name, data, opts}: AddProvidersData,
     myProvidersQueue: Queue = providersQueue
 ): Promise<Job|void> => {
     try {
-        console.log('Adding to fast queue',)
-        return await myProvidersQueue.add(data)
+        console.log('Adding to single queue',)
+        return await myProvidersQueue.add(name, data, opts)
     } catch (e) {
         console.log('Producer Error: ', e)
     }
