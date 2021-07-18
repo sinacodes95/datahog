@@ -6,8 +6,9 @@
   "scripts": {
     "start:providers": "node ./build/providersApi/server.js",
     "start:webhooks": "node ./build/webhooksApi/index.js",
+    "start:callback": "node ./build/callbackApi/index.js",
     "build": "tsc",
-    "lint": "eslint --color './providersApi/**/*.ts' './webhooksApi/**/*.ts'",
+    "lint": "eslint --color './providersApi/**/*.ts' './webhooksApi/**/*.ts' './callbackApi/**/*.ts'",
     "test": "jest --runInBand --forceExit"
   },
   "license": "ISC",

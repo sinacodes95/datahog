@@ -7,7 +7,7 @@ import { Bills, CallbackData, JobData } from "../../types/types";
 const MAX_PROVIDERS = 2;
 
 const providersQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown> => {
-    console.log("Processing fast", job.data);
+    console.log("Processing single job", job.data);
     console.log("attempts made:", job.attemptsMade);
     const providersDataForCallback: {[k: string]: Bills[]} = {};
     try {
@@ -20,7 +20,7 @@ const providersQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown
             return Promise.resolve(data);
         }
     } catch (e) {
-        if (job.attemptsMade >= 2) {
+        if (job.attemptsMade >= 4) {
             notifySupport(job.id);
         }
         return Promise.reject(e)
@@ -44,7 +44,7 @@ const providersBulkQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unk
             return Promise.resolve(data);
         }
     } catch (e) {
-        if (job.attemptsMade >= 2) {
+        if (job.attemptsMade >= 4) {
             notifySupport(job.id);
         }
         return Promise.reject(e)

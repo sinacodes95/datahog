@@ -4,6 +4,7 @@
     "**/webhooksApi/**/*",
     "**/callbackApi/**/*",
     "**/tests/**/*",
+    "**/types/**/*",
   ],
 
   "compilerOptions": {
