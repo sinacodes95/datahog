@@ -27,7 +27,7 @@ const providersQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown
     }
 };
 
-const aggregatedProvidersDataForCallback: {
+export const aggregatedProvidersDataForCallback: {
     [k: string]: Bills[]
 } = {};
 
@@ -35,12 +35,11 @@ const providersBulkQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unk
     console.log('bulk processorof job');
     console.log("attempts made: ", job.attemptsMade);
     try {
-        const {
-            provider, data, status} = await getBillsFromProviders(job.data);
+        const {provider, data, status} = await getBillsFromProviders(job.data);
         console.log('Bulk result ', data);
 
         if(status === 200){
-            await AggregateAndSendProvidersData(provider, data);
+            await aggregateAndSendProvidersData(provider, data);
             return Promise.resolve(data);
         }
     } catch (e) {
@@ -51,12 +50,11 @@ const providersBulkQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unk
     }
 }
 
-const AggregateAndSendProvidersData = async (
+export const aggregateAndSendProvidersData = async (
     provider: string,
     data: Bills[]
 ): Promise<void> => {
     aggregatedProvidersDataForCallback[provider] = data;
-    console.log(JSON.stringify(aggregatedProvidersDataForCallback, null, 2))
     if (Object.keys(aggregatedProvidersDataForCallback).length === MAX_PROVIDERS) {
         await sendBillsOfProvidersToCallbackUrl(aggregatedProvidersDataForCallback)
     }
@@ -68,6 +66,7 @@ const sendBillsOfProvidersToCallbackUrl = async (payload: CallbackData) => {
         await axios.post(`${CALLBACK_BASE_URL}/`, payload)
     } catch (e) {
         console.log('Error while sending data to callback url: ', e)
+        throw(e);
     }
 }
 
@@ -84,9 +83,11 @@ const getBillsFromProviders = async (jobData: JobData): Promise<{
     return {provider, data, status};
 }
 
+export let SUPPORT_NOTIFIED = false
 
 const notifySupport = (jobId: string|number) => {
     console.log(`COMPLETE FAILURE FOR JOB: ${jobId}`);
+    SUPPORT_NOTIFIED = true
 }
 
 export { providersQueueProcess, providersBulkQueueProcess };

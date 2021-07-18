@@ -80,7 +80,7 @@ export const exampleSingleJob = {
     }
     },
     data: {
-    providers: [ 'gas' ],
+    providers: 'gas',
     callbackUrl: 'callback-api://callback-api:5000'
     },
     _progress: 0,

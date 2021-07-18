@@ -15,7 +15,7 @@ describe('Given a bulk request is made', () => {
                     callbackUrl: 'http:helloWorld.com'
                 },
                 opts: {
-                    attempts: 3,
+                    attempts: 5,
                     backoff: 2000
                 }
             },
@@ -26,13 +26,28 @@ describe('Given a bulk request is made', () => {
                     callbackUrl: 'http:helloWorld.com'
                     },
                 opts: {
-                    attempts: 3,
+                    attempts: 5,
                     backoff: 2000
                 }
             }
         ]
         expect(actualResult[0].data.provider).toEqual(expectedResult[0].data.provider);
         expect(actualResult[1].data.provider).toEqual(expectedResult[1].data.provider);
+    });
+
+    test('When bulkJobsDataParser is given less than 2 providers data, Then an error is thrown', () => {
+        const exampleProvidersData = {
+            providers: ['gas'],
+            callbackUrl: 'http:helloWorld.com'
+        }
+        let errorThrown = true
+        try {
+            const actualResult = bulkJobsDataParser(exampleProvidersData);
+            expect(actualResult).toBeFalsy()
+        } catch(e) {
+            errorThrown = true
+        }
+        expect(errorThrown).toBeTruthy();
     });
 
     test('When singleJobsDataParser is invoked, Then an "add queue" objects is returned', () => {
@@ -44,7 +59,7 @@ describe('Given a bulk request is made', () => {
                 callbackUrl: 'http:helloWorld.com'
             },
             opts: {
-                attempts: 3,
+                attempts: 5,
                 backoff: 2000
             }
         }

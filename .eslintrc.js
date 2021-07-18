@@ -28,6 +28,8 @@ module.exports = {
       "@typescript-eslint/no-misused-promises": "off",
       "no-useless-escape": "off",
       "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/require-await": "off"
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/unbound-method": "off"
+
     }
   }

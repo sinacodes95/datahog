@@ -37,4 +37,10 @@ describe('Given a list of providers and a callbackUrl string', () => {
         const result = validateProvidersData(invalidProviders, invalidCallbackUrl);
         expect(result).toBe(false);
     });
+    test('When providers and callbackUrl are not provided, Then return false', () => {
+        const invalidProviders = undefined;
+        const invalidCallbackUrl = undefined;
+        const result = validateProvidersData(invalidProviders, invalidCallbackUrl);
+        expect(result).toBe(false);
+    });
 });
