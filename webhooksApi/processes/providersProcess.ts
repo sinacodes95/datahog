@@ -19,6 +19,7 @@ const providersQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unknown
             aggregatedProvidersDataForCallback = {}
             return Promise.resolve(data);
         }
+        return Promise.reject();
     } catch (e) {
         if (job.attemptsMade >= 4) {
             notifySupport(job.id);
@@ -42,6 +43,7 @@ const providersBulkQueueProcess = async (job: Job<JobData>): Promise<Bills[]|unk
             await aggregateAndSendProvidersData(provider, callbackUrl, data);
             return Promise.resolve(data);
         }
+        return Promise.reject();
     } catch (e) {
         if (job.attemptsMade >= 4) {
             notifySupport(job.id);
@@ -58,14 +60,15 @@ export const aggregateAndSendProvidersData = async (
     aggregatedProvidersDataForCallback[provider] = data;
     if (Object.keys(aggregatedProvidersDataForCallback).length === MAX_PROVIDERS) {
         await sendBillsOfProvidersToCallbackUrl(aggregatedProvidersDataForCallback, callbackUrl);
-        aggregatedProvidersDataForCallback = {};
+        aggregatedProvidersDataForCallback = {}
+
     }
 }
 
 const sendBillsOfProvidersToCallbackUrl = async (payload: CallbackData, callbackUrl: string) => {
     console.log('Sending retrieved data to callbackUrl provided',);
     try {
-        await axios.post(`${callbackUrl}/`, payload)
+        return await axios.post(`${callbackUrl}/`, payload)
     } catch (e) {
         console.log('Error while sending data to callback url: ', e)
         throw(e);
@@ -90,7 +93,7 @@ export let SUPPORT_NOTIFIED = false
 
 const notifySupport = (jobId: string|number) => {
     console.log(`COMPLETE FAILURE FOR JOB: ${jobId}`);
-    SUPPORT_NOTIFIED = true
+    SUPPORT_NOTIFIED = true;
 }
 
 export { providersQueueProcess, providersBulkQueueProcess };

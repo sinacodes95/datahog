@@ -18,7 +18,7 @@ app.get('/', (_req: Request, res: Response) =>  {
 app.post('/', (req: Request, res: Response) => {
 	console.log(`Post request recieved by callback server!: `, req.body);
 	VIRTUAL_DATABASE.push(req.body);
-	res.status(200);
+	res.status(200).end();
 });
 
 app.listen(port, () => console.log(`Callback server listening at http://localhost:${port}`));

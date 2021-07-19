@@ -11,7 +11,7 @@ describe('Given a list of providers and a callbackUrl string', () => {
         expect(areProvidersValid(invalidateProvider)).toBe(false);
     });
     test('When validating callbackUrl, Then return true for a valid Url and false otherwise', () => {
-        const validCallbackUrls = ['http://wonderbill.co.uk', 'http://localhost:4000/queue'];
+        const validCallbackUrls = ['http://google.co.uk', 'http://localhost:4000/queue'];
         const invalidCallbackUrl = 'helloWorld';
 
         for (const url of validCallbackUrls) {
@@ -21,7 +21,7 @@ describe('Given a list of providers and a callbackUrl string', () => {
     });
     test('When validating providers and a callbackUrl string, Then return true if both are valid', () => {
         const validProviders = ["gas", "internet"];
-        const validCallbackUrl = 'http://wonderbill.co.uk';
+        const validCallbackUrl = 'http://google.co.uk';
         const result = validateProvidersData(validProviders, validCallbackUrl);
         expect(result).toBe(true);
     });

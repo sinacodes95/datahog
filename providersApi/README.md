@@ -1,5 +1,5 @@
 # Summary #
-At WonderBill we do a lot of data collection and processing from 3rd-party APIs.
+We do a lot of data collection and processing from 3rd-party APIs.
 We also experience various issues with those APIs - long scheduled maintenance, temporary bad gateway errors due to load etc.
 In order to make our data collection tools scalable and fault-tolerant we've devised a webhook-based asynchronous approach. 
 
